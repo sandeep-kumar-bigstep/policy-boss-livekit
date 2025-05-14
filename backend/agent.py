@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 
 from livekit import agents
+from prompts import HINDI_GREETING_PROMPT, SYSTEM_PROMPT
 from livekit.agents import AgentSession, Agent, RoomInputOptions
 from livekit.plugins import (
     openai,
@@ -8,21 +9,21 @@ from livekit.plugins import (
     deepgram,
     noise_cancellation,
     silero,
+    elevenlabs,
 )
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
-from system_prompt import INSURANCE_ASSISTANT_PROMPT
 
 load_dotenv()
 
 
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(instructions=INSURANCE_ASSISTANT_PROMPT)
+        super().__init__(instructions=SYSTEM_PROMPT)
 
     async def on_enter(self) -> None:
         self._policy_boss_api = self.session.userdata["policy_boss_api"]
         await self.session.generate_reply(
-            instructions="Warmly greet the user and introduce yourself as PolicyBoss AI, a specialized insurance assistant. Mention that you can help them compare policies from over 40 insurance companies. Ask what type of insurance they're interested in (health, life, motor, travel, etc.) and their location (city and state) to provide personalized recommendations. Offer to explain any insurance concepts they might be curious about."
+            instructions=HINDI_GREETING_PROMPT
         )
 
 
@@ -30,13 +31,15 @@ async def entrypoint(ctx: agents.JobContext):
     await ctx.connect()
 
     session = AgentSession(
-        stt=deepgram.STT(model="nova-3", language="multi"),
+        # stt=deepgram.STT(model="nova-3", language="multi"),
+        stt=openai.STT(),
         llm=openai.LLM(model="gpt-4o-mini"),
-        tts=cartesia.TTS(
-            model="sonic-2",
-            voice="28ca2041-5dda-42df-8123-f58ea9c3da00",
-            # language="hi",
-        ),
+        # tts=cartesia.TTS(
+        #     model="sonic-2",
+        #     voice="28ca2041-5dda-42df-8123-f58ea9c3da00",
+        #     # language="hi",
+        # ),
+        tts=elevenlabs.TTS(),
         vad=silero.VAD.load(),
         turn_detection=MultilingualModel(),
     )
