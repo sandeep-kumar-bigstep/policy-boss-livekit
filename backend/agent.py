@@ -100,10 +100,9 @@ async def entrypoint(ctx: agents.JobContext):
             noise_cancellation=noise_cancellation.BVC(), 
         ),
     )
-
-    await session.generate_reply(
-        instructions="Greet the user and offer your assistance."
-    )
+    
+    # Note: We've removed the second greeting here
+    # The greeting is now handled only in the Assistant.on_enter() method
 
 
 if __name__ == "__main__":
