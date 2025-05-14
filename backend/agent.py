@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 
 from livekit import agents
 from prompts import HINDI_GREETING_PROMPT, SYSTEM_PROMPT
-from livekit.agents import AgentSession, Agent, RoomInputOptions
+from livekit.agents import AgentSession, Agent, RoomInputOptions, RunContext
 from livekit.plugins import (
     openai,
     cartesia,
@@ -13,15 +13,57 @@ from livekit.plugins import (
 )
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
+# Import all tools from our tools package
+from tools import (
+    get_vehicle_insurance_quotes,
+    get_policy_details,
+    calculate_premium,
+    check_claim_status,
+    get_agent_commission,
+    get_customer_profile,
+    update_customer_details,
+    get_customer_policies,
+    get_vehicle_details,
+    validate_vehicle_registration
+)
+
 load_dotenv()
 
 
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(instructions=SYSTEM_PROMPT)
+        # Initialize the agent with the system prompt and all the tools
+        super().__init__(
+            instructions=SYSTEM_PROMPT,
+            tools=[
+                # Policy-related tools
+                get_vehicle_insurance_quotes,
+                get_policy_details,
+                calculate_premium,
+                check_claim_status,
+                get_agent_commission,
+                
+                # Customer-related tools
+                get_customer_profile,
+                update_customer_details,
+                get_customer_policies,
+                
+                # Vehicle-related tools
+                get_vehicle_details,
+                validate_vehicle_registration
+            ]
+        )
 
     async def on_enter(self) -> None:
-        self._policy_boss_api = self.session.userdata["policy_boss_api"]
+        # This is a workaround for the demo - in a real implementation,
+        # the policy_boss_api would be properly initialized
+        try:
+            self._policy_boss_api = self.session.userdata["policy_boss_api"]
+        except ValueError:
+            # For demo purposes, we'll just continue without the API
+            self._policy_boss_api = None
+            
+        # Greet the user in Hindi with a female voice
         await self.session.generate_reply(
             instructions=HINDI_GREETING_PROMPT
         )
@@ -34,14 +76,18 @@ async def entrypoint(ctx: agents.JobContext):
         # stt=deepgram.STT(model="nova-3", language="multi"),
         stt=openai.STT(),
         llm=openai.LLM(model="gpt-4o-mini"),
-        # tts=cartesia.TTS(
-        #     model="sonic-2",
-        #     voice="28ca2041-5dda-42df-8123-f58ea9c3da00",
-        #     # language="hi",
-        # ),
+        # Use elevenlabs TTS for better female voice quality
         tts=elevenlabs.TTS(),
         vad=silero.VAD.load(),
         turn_detection=MultilingualModel(),
+        # Initialize with dummy data for demonstration purposes
+        userdata={
+            "policy_boss_api": {
+                "api_key": "dummy_api_key",
+                "agent_id": "AGENT123",
+                "region": "Mumbai"
+            }
+        }
     )
 
     await session.start(
