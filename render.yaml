@@ -12,7 +12,8 @@ services:
   plan: starter
 
   # Docker image to use
-  image: ghcr.io/sandeep-kumar-bigstep/policy-boss-livekit/policy-boss-agent:latest
+  image:
+    url: ghcr.io/sandeep-kumar-bigstep/policy-boss-livekit/policy-boss-agent:latest
 
   # Environment variables are stored in a group
   # created in the Render dashboard.
