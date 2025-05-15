@@ -6,7 +6,7 @@ from livekit.agents import AgentSession, Agent, RoomInputOptions, RunContext
 from livekit.plugins import (
     openai,
     # cartesia,
-    # deepgram,
+    deepgram,
     noise_cancellation,
     silero,
     elevenlabs,
@@ -73,11 +73,14 @@ async def entrypoint(ctx: agents.JobContext):
     await ctx.connect()
 
     session = AgentSession(
-        # stt=deepgram.STT(model="nova-3", language="multi"),
-        stt=openai.STT(),
+        stt=deepgram.STT(model="nova-3", language="multi"),
+        # stt=openai.STT(model="gpt-4o-mini-transcribe"),
         llm=openai.LLM(model="gpt-4o-mini"),
         # Use elevenlabs TTS for better female voice quality
-        tts=elevenlabs.TTS(),
+        tts=elevenlabs.TTS(
+            voice_id="broqrJkktxd1CclKTudW",
+            model="eleven_flash_v2_5"
+        ),
         vad=silero.VAD.load(),
         turn_detection=MultilingualModel(),
         # Initialize with dummy data for demonstration purposes
