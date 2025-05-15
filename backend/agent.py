@@ -5,8 +5,8 @@ from prompts import HINDI_GREETING_PROMPT, SYSTEM_PROMPT
 from livekit.agents import AgentSession, Agent, RoomInputOptions, RunContext
 from livekit.plugins import (
     openai,
-    cartesia,
-    deepgram,
+    # cartesia,
+    # deepgram,
     noise_cancellation,
     silero,
     elevenlabs,
