@@ -1,7 +1,7 @@
 # Dockerfile for PolicyBoss LiveKit Agent
 # syntax=docker/dockerfile:1
 ARG PYTHON_VERSION=3.11.6
-FROM python:${PYTHON_VERSION}-slim
+FROM --platform=linux/amd64 python:${PYTHON_VERSION}-slim
 
 # Prevents Python from writing pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
