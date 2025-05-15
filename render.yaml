@@ -1,9 +1,6 @@
 services:
 - type: pserv
-  repo: https://github.com/sandeep-kumar-bigstep/policy-boss-livekit
-
-  # Change this to the path containing your Dockerfile
-  rootDir: backend
+  # Using prebuilt image, so no repo or rootDir needed
 
   name: policy-boss-agent
   runtime: image
