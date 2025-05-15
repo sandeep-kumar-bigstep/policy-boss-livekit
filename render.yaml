@@ -1,0 +1,29 @@
+services:
+- type: pserv
+  repo: https://github.com/sandeep-kumar-bigstep/policy-boss-livekit
+
+  # Change this to the path containing your Dockerfile
+  rootDir: backend
+
+  name: policy-boss-agent
+  runtime: image
+
+  # Free plan is not available for private services
+  plan: starter
+
+  # Environment variables are stored in a group
+  # created in the Render dashboard.
+  envVars:
+  - fromGroup: policy-boss-agent-env 
+  region: singapore
+
+  # 300s is the standard allowed maximum. Talk to render.com support if you need this increased.
+  maxShutdownDelaySeconds: 300
+
+  # Sane defaults
+  scaling:
+    minInstances: 1
+    maxInstances: 4
+    targetCPUPercent: 80
+    targetMemoryPercent: 80
+version: "1"
